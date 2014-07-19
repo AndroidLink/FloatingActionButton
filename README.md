@@ -55,7 +55,10 @@ Use Drawables of size `24dp` as FabDrawables to get the desired look. Drawables 
     mFab.setOnClickListener();
     ```
 
+## Backport
+1. +SherklockActionBar example that run with API level 7 prior to ICS(level 14)
 
+2. +nineoldandroid to library and provide adaptive implement in class FabUtils to new API, so it could run with API level 7.
 
 
 

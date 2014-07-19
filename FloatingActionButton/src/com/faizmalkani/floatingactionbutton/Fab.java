@@ -1,6 +1,4 @@
 package com.faizmalkani.floatingactionbutton;
-import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,10 +13,8 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 
-public class Fab extends View 
+public class Fab extends View
 {
     Context _context;
     Paint mButtonPaint, mDrawablePaint;
@@ -34,7 +30,6 @@ public class Fab extends View
         init(Color.WHITE);
     }
     
-    @SuppressLint("NewApi")
 	public Fab(Context context)
     {
         super(context);
@@ -58,7 +53,7 @@ public class Fab extends View
 	public void init(int fabColor)
     {
     	setWillNotDraw(false);
-    	this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        setLayerTypeForView(this);
         mButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mButtonPaint.setColor(fabColor);
         mButtonPaint.setStyle(Paint.Style.FILL);
@@ -68,11 +63,11 @@ public class Fab extends View
         
         WindowManager mWindowManager = (WindowManager) _context.getSystemService(Context.WINDOW_SERVICE);
 		Display display = mWindowManager.getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
+		Point size = new Point(display.getWidth(), display.getHeight());
+//		display.getSize(size);
 		mScreenHeight = size.y;
     }
-    
+
     @Override
     protected void onDraw(Canvas canvas) 
     {
@@ -86,16 +81,16 @@ public class Fab extends View
 	{
 		if(event.getAction() == MotionEvent.ACTION_UP)
 		{
-			setAlpha(1.0f);
+			setAlphaForView(this, 1.0f);
 	    }
 		else if(event.getAction() == MotionEvent.ACTION_DOWN)
 	    {
-			setAlpha(0.6f);
+			setAlphaForView(this, 0.6f);
 	    }
 		return super.onTouchEvent(event);
 	}
-    
-	public int dpToPx(int dp) 
+
+    public int dpToPx(int dp)
 	{
 	    DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
 	    int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));       
@@ -106,23 +101,34 @@ public class Fab extends View
 	{
 		if(mHidden == false)
 		{
-			currentY = getY();
-			ObjectAnimator mHideAnimation = ObjectAnimator.ofFloat(this, "Y", mScreenHeight);
-			mHideAnimation.setInterpolator(new AccelerateInterpolator());
-			mHideAnimation.start();
+            currentY = getYForView(this);
+			animateY(this, currentY, mScreenHeight);
 			mHidden = true;
 		}
 	}
-	
-	public void showFab()
+
+    public void showFab()
 	{
 		if(mHidden == true)
 		{
-			ObjectAnimator mShowAnimation = ObjectAnimator.ofFloat(this, "Y", currentY);
-			mShowAnimation.setInterpolator(new DecelerateInterpolator());
-			mShowAnimation.start();
+            animateY(this, mScreenHeight, currentY);
 			mHidden = false;
 		}
 	}
-    
+
+    private static void animateY(View view, float current, float target) {
+        FabUtils.animateY(view, current, target);
+    }
+
+    private static void setAlphaForView(View v, float alpha) {
+        FabUtils.setAlphaForView(v, alpha);
+    }
+
+    private static void setLayerTypeForView(View view) {
+        FabUtils.setLayerTypeForView(view);
+    }
+
+    private float getYForView(View view) {
+        return FabUtils.getYForView(view);
+    }
 }
